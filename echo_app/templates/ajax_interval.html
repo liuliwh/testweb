@@ -1,0 +1,52 @@
+{% extends "layout.html" %}
+{% block head %}
+<script src="{{ url_for('static', filename='scripts/axios.min.js')}}"></script>
+{% endblock %}
+{% block content %}
+<pre>
+{"template":"ajax_interval","specific":{"url": "/ajax_interval","url_type": "static",
+"method":"get","withCredentials":""}}
+</pre>
+<button id="btn_clear">Clear</button>
+<div>
+    <pre id="ajax_result"></pre>
+</div>
+<script>
+    function set_result(txt) {
+        document.querySelector('#ajax_result').innerHTML = txt;
+    }
+</script>
+
+
+<script>
+    var count = 0;
+    function sendRequest() {
+        let post_data = {
+            "name": "name",
+            "pwd": "pwd",
+        };
+        let method = "{{ data.method | lower }}";
+        axios.request({
+            method: method,
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'X-IS-AJAX': 'true' },
+            params: method != 'get' ? undefined : post_data,
+            data: method == 'get' ? undefined : post_data,
+            url: "{{ data.url | safe }}",
+                {% if data.withCredentials == 'true' %}
+    withCredentials: true,
+        {% elif data.withCredentials != '' %}
+    withCredentials: false,
+        {% endif %}
+            }).then(function (resp) {
+            count += 1;
+            set_result(JSON.stringify(count));
+        });
+    }
+    var interval_id = setInterval(sendRequest, 5000);
+    (function clearHandler() {
+        document.querySelector('#btn_clear').addEventListener('click', function (event) {
+            clearInterval(interval_id);
+        }, true);
+    })();
+</script>
+{% endblock %}

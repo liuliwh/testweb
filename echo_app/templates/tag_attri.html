@@ -1,0 +1,53 @@
+{% extends "layout.html" %}
+{% block template_specific %}
+
+
+<pre>
+  {"template":"tag_attri","specific":{"url": "/abc", "url_type": "static","attri":"href","tag":"a"}}
+</pre>
+<p>元素已创建并先点位，再通过js对属性赋值</p>
+{% endblock %}
+{% block content %}
+
+
+
+<br>
+{% if data.tag == 'source' %}
+<video controls>
+    <source {% if data.url_type=="static" %} src="{{ data.url | safe }}" {% endif %} type="video/mp4"
+        id="test_target" />
+</video>
+{% elif data.tag == 'form' %}
+<form {% if data.url_type=="static" %} action="{{ data.url | safe }}" {% endif %} method="post" id="test_target">
+    <input type="text" name="name" value="hello" hidden>
+    <button>Submit</button>
+</form>
+{% elif data.tag == 'link' %}
+<link {% if data.url_type=="static" %} href="{{ data.url | safe }}" {% endif %} rel="preload" as="script"
+    id="test_target" />
+{% elif data.tag == 'input' %}
+<form>
+    <input type="image" {% if data.url_type=="static" %} src="{{ data.url | safe }}" {% endif %} id="test_target">
+</form>
+{%else %}
+<{{data.tag}} {% if data.url_type=="static" %} {{data.attri}}="{{ data.url | safe }}" {% endif %} id="test_target">
+    {% if data.tag == 'a' %} test_link</a>
+    {% elif data.tag != 'img' %}</{{data.tag}}>{% endif %}
+{% endif %}
+<br>
+{% if data and data.url_type != 'static' %}
+<script>
+    (function changeAttribute() {
+        var ele = document.querySelector('#test_target');
+        {% if  data.url_type == 'assign' %}
+        ele["{{ data.attri }}"] = "{{ data.url | safe }}";
+        {% elif data.url_type == 'setattribute' %}
+        ele.setAttribute("{{ data.attri }}", "{{ data.url | safe }}");
+        {% endif %}
+        {% if  data.tag == 'a' %}
+        ele.innerHTML = 'test_link';
+        {% endif %}
+    })();
+</script>
+{% endif %}
+{% endblock %}

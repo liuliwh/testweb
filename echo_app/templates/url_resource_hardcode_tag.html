@@ -1,0 +1,33 @@
+{% extends "layout.html" %}
+{% block template_specific %}
+<pre>
+  {"template":"url_resource_hardcode_tag","specific":{ "url_type": "static"}}
+</pre>
+{% endblock %}
+
+{% block content %}
+
+{% if data and data.url_type == 'dynamic' %}
+<template id="template">
+    {% endif %}
+
+    <h5>相对路径，后缀</h5>
+    <img src="{{ 'a_dummy.jpg?a=b' | safe }}"></script>
+    <script src="{{ 'a_dummy.js?a=b' | safe }}"></script>
+    <img src="{{ 'a_dummy.jpg' | safe }}"></script>
+    <script src="{{ 'a_dummy.js' | safe }}"></script>
+    <h5>相对路径，有后缀</h5>
+    <img src="{{ 'a_dummy.jpg?a=b' | safe }}"></script>
+    <script src="{{ 'a_dummy.js?a=b' | safe }}"></script>
+    <img src="{{ 'a_dummy.jpg' | safe }}"></script>
+    <script src="{{ 'a_dummy.js' | safe }}"></script>
+    <h5>绝对路径，无后缀</h5>
+    <img src="{{ '/a_dummy?a=b' | safe }}"></script>
+    <script src="{{ '/a_dummy?a=b' | safe }}"></script>
+    <img src="{{ '/a_dummy' | safe }}"></script>
+    <script src="{{ '/a_dummy' | safe }}"></script>
+    {% if data and data.url_type == 'dynamic' %}
+</template>
+{% endif %}
+
+{% endblock %}

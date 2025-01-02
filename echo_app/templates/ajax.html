@@ -1,0 +1,50 @@
+{% extends "layout.html" %}
+{% block head %}
+<script src="{{ url_for('static', filename='scripts/axios.min.js')}}"></script>
+{% endblock %}
+{% block content %}
+<pre>
+{"template":"ajax","specific":{"url": "/abc","url_type": "static",
+"method":"get","withCredentials":""}}
+</pre>
+<input type="text" name="name" placeholder="name" />
+<input type="text" name="pwd" placeholder="password" />
+<button id="btn_submit">Submit</button>
+<button id="btn_clear" onclick="set_result('');">Clear</button>
+<div>
+    <pre id="ajax_result"></pre>
+</div>
+<script>
+    function set_result(txt) {
+        document.querySelector('#ajax_result').innerHTML = txt;
+    }
+</script>
+
+
+<script>
+    (function addSubmitHandler() {
+        document.querySelector('#btn_submit').addEventListener('click', function (event) {
+            set_result('');
+            let post_data = {
+                "name": document.querySelector('input[name="name"]').value,
+                "pwd": document.querySelector('input[name="pwd"]').value,
+            };
+            let method = "{{ data.method | lower }}";
+            axios.request({
+                method: method,
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'X-IS-AJAX': 'true' },
+                params: method != 'get' ? undefined : post_data,
+                data: method == 'get' ? undefined : post_data,
+                url: "{{ data.url | safe }}",
+                {% if data.withCredentials == 'true' %}
+                withCredentials: true,
+            {% elif data.withCredentials != '' %}
+                withCredentials: false,
+        {% endif %}
+            }).then(function (resp) {
+            set_result(JSON.stringify(resp.data));
+        });
+        }, true);
+    }) ();
+</script>
+{% endblock %}

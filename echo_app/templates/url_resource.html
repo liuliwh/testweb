@@ -1,0 +1,38 @@
+{% extends "layout.html" %}
+{% block template_specific %}
+<pre>
+  {"template":"url_resource","specific":{"url": "/abc", "url_type": "static"}}
+</pre>
+{% endblock %}
+
+{% block content %}
+
+{% if data and data.url_type == 'dynamic' %}
+<template id="template">
+{% endif %}
+{% if data and data.url %}
+  <script src="{{ data.url | safe }}_dummy.js"></script>
+  <map name="primary">
+    <area shape="default" href="left.html" />
+  </map>
+  <img usemap="#primary" src="{{ data.url | safe }}/350x150" alt="350 x 150 pic" />
+
+  <video controls width="250">
+
+    <source src="{{ data.url | safe }}.webm" type="video/webm">
+
+    <source src="{{ data.url  | safe}}.mp4" type="video/mp4">
+
+    Download the
+    <a href="{{ data.url | safe }}.webm">WEBM</a>
+    or
+    <a href="{{ data.url | safe }}.mp4">MP4</a>
+    video.
+  </video>
+{% endif %}
+
+{% if data and data.url_type == 'dynamic' %}
+</template>
+{% endif %}
+
+{% endblock %}

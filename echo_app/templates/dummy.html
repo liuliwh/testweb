@@ -1,0 +1,25 @@
+{% extends "layout.html" %}
+{% block content %}
+<button onclick="getCurrentLocation()">
+    Get URL
+</button>
+<button onclick="setCurrentLocation()">
+    Change URL
+</button>
+
+<script>
+    function getCurrentLocation() {
+
+        // Get current location
+        let loc = window.location.href;
+        alert(loc);
+    }
+    function setCurrentLocation() {
+
+        // Change current location
+        var newloc = window.location.href + 'a?a';
+        var e = Object.assign({ "a": 1 }, location)
+        e['replace'](newloc);
+    }
+</script>
+{% endblock %}

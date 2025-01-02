@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="{{ data.charset }}" />
+    <title>TestWeb</title>
+
+    {% if data.base_tag and data.base_tag.tag_type == 'static' %}
+    <base href="{{ data.base_tag.href }}" />
+    {% elif data.base_tag and data.base_tag.tag_type == 'dynamic' %}
+    <script>
+        var base = '<base href="{{ data.base_tag.href }}" />';
+        document.write(base);
+    </script>
+    {% endif %}
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css')}}" />
+    {% block head %}
+    {% endblock %}
+</head>
+
+<body>
+    <div class="navbar">
+        <a href="{{ url_for('home') }}" class="navbar-brand">Home</a>
+        <a href="{{ url_for('anchor') }}" class="navbar-item">Anchor</a>
+        <a href="{{ url_for('url_resource') }}" class="navbar-item">URL_Resource</a>
+        <a href="/websocketdemo" class="navbar-item">websocket</a>
+        <a href="/a/dummy/dummy" class="navbar-item">Dummy/Dummy</a>
+    </div>
+    <div>
+        <pre id="current_location"></pre>
+        <pre id="page_res"></pre>
+    </div>
+
+
+    <div class="body-content">
+        {% block template_specific %}
+        {% endblock %}
+        {% block content %}
+        {% endblock %}
+    </div>
+    <div id="template_hint">
+        <div class="tooltip">
+            {% if data and data.charset and data.charset.upper() in ['ISO-8859-1','WINDOWS-1252'] %}
+            Template List:Hover
+            {% else %}
+            模板列表:Hover
+            {% endif %}
+            <pre class="tooltiptext">
+      Templates: {{ template_list }}
+    </pre>
+        </div>
+        <pre>
+        {"template":"form",
+          "base_tag":{"tag_type":"static","href":"abc"},
+          "response": {"content_type":"text/html; charset=utf-8"},
+          "specific":{}
+        }
+    </pre>
+    </div>
+    <div class="parent">
+        <div class="child">
+            <form id="form_gen_page" action="/gen_page" method="post" enctype="text/plain"
+                onsubmit="return _gen_submit(event)">
+                <textarea id="txt_gen_page" cols="40" rows="10" name="data"></textarea>
+                <button id="btn_gen_page">Generate Page</button>
+            </form>
+        </div>
+        <div class="child">
+            <p>charset: ["UTF-8", "gb2312", "Windows-1252", "ISO-8859-1"]</p>
+            <p>url_type: dynamic: use template clone then insert into document.</p>
+            <p>url_type: setattribute: createElement, setattribute, then insert into document.</p>
+        </div>
+    </div>
+
+    <footer>
+        <p>echo url,args,form,data as raw input as possible, so don't convert to json</p>
+        <pre id="echo_request">
+        {
+            "url": "{{ request.url }}",
+            "args": "{{ request.args }}",
+            "data": "{{request.get_data(as_text=True) }}",
+            "Headers": {{ request.headers.to_wsgi_list() | tojson }}
+        }
+    </pre>
+    </footer>
+    <script>
+        function _gen_submit(e) {
+            var ele = document.querySelector('#txt_gen_page');
+            var txt = ele.value;
+            ele.value = JSON.stringify(txt);
+        }
+
+    </script>
+
+    {% block tail_script %}
+    {% endblock %}
+    <script>
+        (function insertTemplate() {
+            var template = document.getElementById('template');
+            if (template) {
+                var clon = template.content.cloneNode(true);
+                var form = document.getElementById('form_gen_page');
+                form.parentNode.insertBefore(clon, form);
+            }
+        })();
+        (function _current_location() {
+            var ele = document.querySelector('#current_location');
+            var e = Object.assign({ "a": 1 }, location);
+            var e = window.location.
+                ele.innerHTML = e.toString();
+        })();
+        var e = document.createElement('a');
+        var base = location['origin'];
+        e.href = new URL("abc", base).toString() + '?1fixed' + Math.random().toString(36);
+        e.innerText = 'click me';
+        document.querySelector('#echo_request').appendChild(e);
+    </script>
+</body>
+
+</html>

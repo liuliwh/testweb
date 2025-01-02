@@ -1,0 +1,38 @@
+{% extends "layout.html" %}
+{% block template_specific %}
+<pre>
+  {"template":"anchor","specific":{"url": "/abc", "url_type": "static"}}
+</pre>
+{% endblock %}
+{% block content %}
+
+{% if data and data.url_type == 'dynamic' %}
+<template id="template">
+{% endif %}
+{% if data and data.url_type != 'setattribute' %}
+<br>
+{% if data.url_download %}
+<a href="{{ data.url | safe }}.jpg" download="{{ data.url_download }}">test_link</a>
+{% else %}
+<a href="{{ data.url | safe }}">test_link</a><br>
+{% endif %}
+{% endif %}
+
+{% if data and data.url_type == 'dynamic' %}
+</template>
+{% endif %}
+{% endblock %}
+
+{% block tail_script %}
+{% if data and data.url_type == 'setattribute' %}
+<script>
+    (function insertElement() {
+        var ele = document.createElement("a");
+        ele.setAttribute("href", "{{ data.url | safe }}");
+        ele.text = 'test_link';
+        var form = document.getElementById('form_gen_page');
+        form.parentNode.insertBefore(ele, form);
+    })();
+</script>
+{% endif %}
+{% endblock %}

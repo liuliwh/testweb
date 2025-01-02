@@ -1,0 +1,31 @@
+
+{% if data.url_type == 'static' %}
+<form id="test_form" method="{{ data.method }}" enctype="{{ data.enc_type }}" action="{{ data.url | safe }}">
+{% elif data.url_type == 'dynamic' or data.url_type == 'setattribute'  %}
+<form id="test_form" method="{{ data.method }}" enctype="{{ data.enc_type }}">
+{% else %}
+<form id="test_form">
+{% endif %}
+
+<input type="text" name="name" placeholder="name" />
+<input type="text" name="pwd" placeholder="password" />
+<input type="file" multiple name="photos" />
+<input type="submit" id="btn_submit" value="Submit" />
+</form>
+
+{% if data.url_type == 'dynamic' %}
+  <script>
+    (function () {
+      var form = document.getElementById('test_form');
+      form.action = "{{ data.url | safe }}";
+    })();
+  </script>
+{% elif data.url_type == 'setattribute' %}
+  <script>
+    (function () {
+      var form = document.getElementById('test_form');
+      form.setAttribute('action', "{{ data.url | safe }}");
+    })();
+  </script>
+{% endif %}
+

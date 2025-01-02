@@ -1,0 +1,10 @@
+{% extends "layout.html" %}
+{% block template_specific %}
+<pre>
+  {"template":"form","specific":{"url": "/abc","url_type": "static",
+    "method":"get","enc_type":"application/x-www-form-urlencoded"}}
+</pre>
+{% endblock %}
+{% block content %}
+{% include 'part_form.html' %}
+{% endblock %}

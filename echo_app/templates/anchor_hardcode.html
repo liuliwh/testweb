@@ -1,0 +1,75 @@
+{% extends "layout.html" %}
+{% block template_specific %}
+<pre>
+  {"template":"anchor_hardcode", "specific": {"url_type": "static"}}
+</pre>
+{% endblock %}
+{% block content %}
+{% if data and data.url_type == 'dynamic' %}
+<template id="template">
+{% endif %}
+
+<h3>中文字符不在此页面测试范围内.</h3>
+<h4>raw_chars</h4>
+<h5>Start</h5>
+<p><a href="{{ '\nsnow.html' | safe }}">raw_chars0</a>should encode LF</p>
+<p><a href="{{ '\fsnow.html' | safe }}">raw_chars1</a>should encode FF</p>
+<p><a href="{{ '\rsnow.html' | safe }}">raw_chars2</a>should encode SP</p>
+<p><a href="{{ '\0snow.html' | safe }}">raw_chars3</a>should encode NULL</p>
+<h5>middle</h5>
+<p><a href="{{ 'a\nsnow.html' | safe }}">raw_chars4</a>should encode LF</p>
+<p><a href="{{ 'a\fsnow.html' | safe }}">raw_chars5</a>should encode FF</p>
+<p><a href="{{ 'a\rsnow.html' | safe }}">raw_chars6</a>should encode SP</p>
+<p><a href="{{ 'a\0snow.html' | safe }}">raw_chars7</a>should encode NULL</p>
+<h5>end</h5>
+<p><a href="{{ 'snow.html\n' | safe }}">raw_chars8</a>should encode LF</p>
+<p><a href="{{ 'snow.html\f' | safe }}">raw_chars9</a>should encode FF</p>
+<p><a href="{{ 'snow.html\r' | safe }}">raw_chars10</a>should encode SP</p>
+<p><a href="{{ 'snow.html\0' | safe }}">raw_chars11</a>should encode NULL</p>
+<h4>ascii_set</h4>
+<h5>控制字符全集: SKIP </h5>
+<a href="{{ '\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f' | safe }}">ascii_set0</a><br>
+<a href="{{ '\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f' | safe }}">ascii_set1</a><br>
+<h5>其它ascii字符</h5>
+<a href="{{ '\x20\x21\x22\x23\x24\x25\x26\x27\x28\x29\x2a\x2b\x2c\x2d\x2e\x2f' | safe }}">ascii_set2</a><br>
+<a href="{{ '\x30\x31\x32\x33\x34\x35\x36\x37\x38\x39\x3a\x3b\x3c\x3d\x3e\x3f' | safe }}">ascii_set3</a><br>
+<a href="{{ '\x40\x41\x42\x43\x44\x45\x46\x47\x48\x49\x4a\x4b\x4c\x4d\x4e\x4f' | safe }}">ascii_set4</a><br>
+<a href="{{ '\x50\x51\x52\x53\x54\x55\x56\x57\x58\x59\x5a\x5b\x5c\x5d\x5e\x5f' | safe }}">ascii_set5</a><br>
+<a href="{{ '\x60\x61\x62\x63\x64\x65\x66\x67\x68\x69\x6a\x6b\x6c\x6d\x6e\x6f' | safe }}">ascii_set6</a><br>
+<a href="{{ '\x70\x71\x72\x73\x74\x75\x76\x77\x78\x79\x7a\x7b\x7c\x7d\x7e\x7f' | safe }}">ascii_set7</a><br>
+<h4>Patch ascii_set</h4>
+<p>ref-for-ascii-whitespace "https://infra.spec.whatwg.org/#ref-for-ascii-whitespace".</p>
+<p>ascii whitespace only<a href="{{ '\x09\x0a\x0b\x0c\x0d' | safe }}">patch_ascii_set0</a><br></p>
+<p>char + ascii whitespace <a href="{{ 'a\x09\x0a\x0b\x0c\x0d' | safe }}">patch_ascii_set1</a><br></p>
+<p>ascii whitespace + char <a href="{{ '\x09\x0a\x0b\x0c\x0da' | safe }}">patch_ascii_set2</a><br></p>
+<p>char + ascii whitespace +char<a href="{{ 'a\x09\x0aa\x0b\x0c\x0da' | safe }}">patch_ascii_set3</a><br></p>
+<p>x23 = "#", 作为path的时候不适当，会掩盖24到2f的测试数据，故提出来再测一遍.</p>
+<a href="{{ '\x20\x21\x22\x24\x25\x26\x27\x28\x29\x2a\x2b\x2c\x2d\x2e\x2f' | safe }}">patch_ascii_set4</a><br>
+<h4>above_ascii</h4>
+<a href="{{ '\x80\x81\x82\x83\x84\x85\x86\x87\x88\x89\x8a\x8b\x8c\x8d\x8e\x8f' | safe }}">above_ascii8</a><br>
+<a href="{{ '\x90\x91\x92\x93\x94\x95\x96\x97\x98\x99\x9a\x9b\x9c\x9d\x9e\x9f' | safe }}">above_ascii9</a><br>
+<a href="{{ '\xa0\xa1\xa2\xa3\xa4\xa5\xa6\xa7\xa8\xa9\xaa\xab\xac\xad\xae\xaf' | safe }}">above_asciia</a><br>
+<a href="{{ '\xb0\xb1\xb2\xb3\xb4\xb5\xb6\xb7\xb8\xb9\xba\xbb\xbc\xbd\xbe\xbf' | safe }}">above_asciib</a><br>
+<a href="{{ '\xc0\xc1\xc2\xc3\xc4\xc5\xc6\xc7\xc8\xc9\xca\xcb\xcc\xcd\xce\xcf' | safe }}">above_asciic</a><br>
+<a href="{{ '\xd0\xd1\xd2\xd3\xd4\xd5\xd6\xd7\xd8\xd9\xda\xdb\xdc\xdd\xde\xdf' | safe }}">above_asciid</a><br>
+<a href="{{ '\xe0\xe1\xe2\xe3\xe4\xe5\xe6\xe7\xe8\xe9\xea\xeb\xec\xed\xee\xef' | safe }}">above_asciie</a><br>
+<a href="{{ '\xf0\xf1\xf2\xf3\xf4\xf5\xf6\xf7\xf8\xf9\xfa\xfb\xfc\xfd\xfe\xff' | safe }}">above_asciif</a><br>
+<h4>Patch above_ascii</h4>
+<p>处理a0有问题，暂时提出来</p>
+<a href="{{ '\xa1\xa2\xa3\xa4\xa5\xa6\xa7\xa8\xa9\xaa\xab\xac\xad\xae\xaf' | safe }}">patch_above_ascii0</a><br>
+<p>单测a0的组合</p>
+<p>a0开头<a href="{{ '\xa0a' | safe }}">patch_above_ascii1</a></p>
+<p>a0结尾<a href="{{ 'a\xa0' | safe }}">patch_above_ascii2</a></p>
+<p>a0中间<a href="{{ 'a\xa0a' | safe }}">patch_above_ascii3</a></p>
+<p>仅a0<a href="{{ '\xa0' | safe }}">patch_above_ascii4</a></p>
+<h4>percent_encoded,其它地方有cover正常场景，这里只是快速验证以达完整性</h4>
+<a href="{{ '%20snow.html' | safe }}">percent_encoded0</a><br>
+<p> [Skip DAP-4861],不是%[:hex][:hex]格式的，会被当成invalid format </p>
+<a href="{{ '%foo%bar%zap%' | safe }}">percent_encoded1</a><br>
+
+{% if data and data.url_type == 'dynamic' %}
+</template>
+{% endif %}
+    <a href=".."> to .. </a>
+{% endblock %}
+

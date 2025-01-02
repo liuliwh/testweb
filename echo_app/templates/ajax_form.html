@@ -1,0 +1,75 @@
+{% extends "layout.html" %}
+{% block head %}
+{% if data and data.flavor == 'vanilla' %}
+<script src="{{ url_for('static', filename='scripts/ajax_form.js')}}"></script>
+{% elif data and data.flavor == 'axios' %}
+<script src="{{ url_for('static', filename='scripts/axios.min.js')}}"></script>
+{% endif %}
+{% endblock %}
+{% block content %}
+{% include 'part_form.html' %}
+<pre>
+{"template":"ajax_form","specific":{"flavor":"axios", "url": "/abc","url_type": "static",
+"method":"get","enc_type":"application/x-www-form-urlencoded"}}
+</pre>
+<button id="btn_clear" onclick="set_result('');">Clear</button>
+<div>
+    <pre id="ajax_result"></pre>
+</div>
+<script>
+    function set_result(txt) {
+        document.querySelector('#ajax_result').innerHTML = txt;
+    }
+</script>
+
+{% if data and data.flavor == 'vanilla' %}
+<script>
+    function xhrSuccess() {
+        set_result(this.responseText);
+    }
+
+    (function addSubmitFormEventHandler() {
+        var test_form = document.querySelector('#test_form');
+        if (test_form) {
+            test_form.addEventListener("submit", function (event) {
+                event.preventDefault();
+                set_result('');
+                XHRSubmitForm(document.querySelector('#test_form'), xhrSuccess);
+            }, true);
+        }
+    })();
+</script>
+{% elif data and data.flavor == 'axios' %}
+<script>
+    (function addSubmitFormEventHandler() {
+        var test_form = document.querySelector('#test_form');
+        if (test_form) {
+            test_form.addEventListener("submit", function (event) {
+                event.preventDefault();
+                set_result('');
+                let data = {
+                    "name": test_form.querySelector('input[name="name"]').value,
+                    "pwd": test_form.querySelector('input[name="pwd"]').value,
+                    "photos": test_form.querySelector('input[name="photos"]').value,
+                };
+                let post_data = undefined;
+                if (test_form.enctype == "multipart/form-data") {
+                    post_data = new FormData(test_form);
+                } else {
+                    post_data = data;
+                }
+                axios.request({
+                    method: test_form.method,
+                    headers: { 'Content-Type': test_form.enctype, 'X-IS-AJAX': 'true' },
+                    params: test_form.method.toLowerCase() != 'get' ? undefined : data,
+                    data: test_form.method.toLowerCase() == 'get' ? undefined : post_data,
+                    url: test_form.action,
+                }).then(function (resp) {
+                    set_result(JSON.stringify(resp.data));
+                });
+            }, true);
+        }
+    })();
+</script>
+{% endif %}
+{% endblock %}

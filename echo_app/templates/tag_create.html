@@ -1,0 +1,134 @@
+{% extends "layout.html" %}
+{% block template_specific %}
+
+
+<pre>
+  {"template":"tag_create","specific":{"url": "/abc", "url_type": "dynamic","attri":"href","tag":"a"}}
+</pre>
+<p>动态元素的时候，是通过js创建，再调用接口，再插入页面.<b>url_type不支持static</b></p>
+{% endblock %}
+{% block content %}
+
+{% if data and data.url_type == 'dynamic' %}
+<template id="template">
+    {% if data.tag == 'source' %}
+    <video controls>
+        <source src="{{ data.url | safe }}" type="video/mp4" id="test_target" />
+    </video>
+    {% elif data.tag == 'form' %}
+    <form action="{{ data.url | safe }}" method="post">
+        <input type="text" name="name" value="hello" hidden>
+        <button id="test_target">Submit</button>
+    </form>
+    {% elif data.tag == 'link' %}
+    <link href="{{ data.url | safe }}" rel="preload" as="script" />
+    {% elif data.tag == 'input' %}
+    <form>
+        <input type="image" src="{{ data.url | safe }}">
+    </form>
+    {%else %}
+    <{{data.tag}} {{data.attri}}="{{ data.url | safe }}" id="test_target">
+        {% if data.tag != 'img' %}test_link</{{data.tag}}>{% endif %}
+    {% endif %}
+</template>
+{% endif %}
+{% endblock %}
+
+{% block tail_script %}
+{% if data and (data.url_type == 'setattribute' or data.url_type == 'assign') %}
+<script>
+    (function insertElement() {
+        var ele;
+        var url = "{{ data.url | safe }}";
+        var tag = "{{ data.tag }}";
+        var attr = "{{ data.attri }}";
+        function doSource() {
+            var video = document.createElement('video');
+            var src = document.createElement('source');
+            src.type = "video/mp4";
+            {% if  data.url_type == 'assign' %}
+            src.src = url;
+            {% else %}
+            src.setAttribute(attr, url);
+            {% endif %}
+            video.appendChild(src);
+            return video;
+        }
+        function doForm() {
+            var form = document.createElement('form');
+            {% if  data.url_type == 'assign' %}
+            form.action = url;
+            {% else %}
+            form.setAttribute(attr, url);
+            {% endif %}
+            form.method = 'post';
+            var name = document.createElement('input');
+            name.type = 'text';
+            name.name = 'name';
+            name.hidden = true;
+            name.value = "hello";
+            var btn = document.createElement('button');
+            btn.id = 'test_target';
+            btn.innerText = 'Submit';
+            form.appendChild(name);
+            form.appendChild(btn);
+            return form;
+        }
+        function doLink() {
+            var link = document.createElement('link');
+            {% if  data.url_type == 'assign' %}
+            link.href = url;
+            {% else %}
+            link.setAttribute(attr, url);
+            {% endif %}
+            link.rel = 'preload';
+            link.as = 'script';
+            return link;
+        }
+        function doInput() {
+            var form = document.createElement('form');
+            var iput = document.createElement('input');
+            iput.type = 'image';
+            {% if  data.url_type == 'assign' %}
+            iput.src = url;
+            {% else %}
+            iput.setAttribute(attr, url);
+            {% endif %}
+            form.appendChild(iput);
+            return form;
+        }
+        function doOther() {
+            var _ele = document.createElement(tag);
+            {% if  data.url_type == 'assign' %}
+            _ele[attr] = url;
+            {% else %}
+            _ele.setAttribute(attr, url);
+            {% endif %}
+            _ele.id = 'test_target';
+            if (tag == 'a') {
+                _ele.innerText = 'test link';
+            }
+            return _ele;
+        }
+        switch (tag) {
+            case 'source':
+                ele = doSource();
+                break;
+            case 'form':
+                ele = doForm();
+                break;
+            case 'link':
+                ele = doLink();
+                break;
+            case 'input':
+                ele = doInput();
+                break;
+            default:
+                ele = doOther();
+        }
+        var form = document.getElementById('form_gen_page');
+        form.parentNode.insertBefore(ele, form);
+    })();
+</script>
+{% endif %}
+{% endblock %}
