@@ -1,7 +1,0 @@
-flask
-flask-cors
-gunicorn
-flake8
-mypy
-black
-flask-socketio

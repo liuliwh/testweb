@@ -1,0 +1,42 @@
+
+services:
+  web:
+    build:
+      context: ./echo_app
+      dockerfile: Dockerfile
+    expose:
+      - 80
+  ws:
+    build:
+      context: ./echo_ws
+      dockerfile: Dockerfile
+    expose:
+      - 80
+  dav:
+    image: bytemark/webdav
+    restart: always
+    expose:
+      - 80
+    environment:
+      AUTH_TYPE: Digest
+      USERNAME: admin
+      PASSWORD: admin
+      LOCATION: /dav
+    volumes:
+      - webdav_data:/var/lib/dav
+  haproxy:
+    image: haproxy:latest
+    ports:
+      - "8084:80"
+    volumes:
+      - ./haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
+    depends_on:
+      - web
+      - ws
+      - dav
+    links:
+      - web
+      - ws
+      - dav
+volumes:
+  webdav_data:

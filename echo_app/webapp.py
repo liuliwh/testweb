@@ -6,9 +6,6 @@ from typing import List
 
 from flask import Response, request
 
-from flask_sock import Sock
-
-# from flask_socketio import SocketIO as Sock, emit
 
 # from . import middlewares
 from . import app  # For application discovery by the 'flask' command.
@@ -26,7 +23,6 @@ def _template_name_list() -> List:
 
 
 app.config["TEMPLATE_LIST"] = _template_name_list()
-
 
 @app.template_filter("b64encode")
 def b64encode_filter(s: bytes) -> str:
@@ -121,13 +117,3 @@ def _encode_cookie_in_request() -> str:
     logger.info(f"rcved cookies: {cookie_names}")
     encoded = base64.b64encode(cookie_names.encode("utf-8"))
     return encoded.decode("utf-8")
-
-
-sock = Sock(app)
-
-
-@sock.route("/mywsdemo")
-def echo(sock):
-    while True:
-        data = sock.receive()
-        sock.send(f"Echo:{data}")

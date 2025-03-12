@@ -2,106 +2,59 @@
 {% block content %}
 <div id="page-wrapper">
     <h1>WebSockets Demo</h1>
-
-    <div id="status">Connecting...</div>
-
     <ul id="messages"></ul>
-
-    <form id="message-form" action="#" method="post">
+    <form id="message-form" onsubmit="return submit_form()">
         <textarea id="message" placeholder="Write your message here..." required></textarea>
         <button type="submit">Send Message</button>
-        <button type="button" id="close">Close Connection</button>
     </form>
+
+    <button type="button" id="close" onclick="close_socket()">Close Connection</button>
+    <button type="button" id="large_payload" onclick="send_large_data()">Large Payload</button>
+
 </div>
-<style>
-    .open {
-        color: green;
-    }
-
-    .closed {
-        color: red;
-    }
-
-    .error {
-        color: red;
-    }
-</style>
-
-<script>
-    window.onload = function () {
-
-        // Get references to elements on the page.
-        var form = document.getElementById('message-form');
-        var messageField = document.getElementById('message');
-        var messagesList = document.getElementById('messages');
-        var socketStatus = document.getElementById('status');
-        var closeBtn = document.getElementById('close');
-
-
-        // Create a new WebSocket.
-        var protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
-        var host = window.location.host;
-        var socket = new WebSocket(protocol + "//" + host + "/mywsdemo");
-
-        // Handle any errors that occur.
-        socket.onerror = function (error) {
-            socketStatus.innerHTML = 'WebSocket Error: ' + error;
-            socketStatus.className = 'error';
-        };
-
-
-        // Show a connected message when the WebSocket is opened.
-        socket.onopen = function (event) {
-            socketStatus.innerHTML = 'Connected to: ' + event.currentTarget.url;
-            socketStatus.className = 'open';
-        };
-
-
-        // Handle messages sent by the server.
-        socket.onmessage = function (event) {
-            var message = event.data;
-            messagesList.innerHTML += '<li class="received"><span>Received:</span>' + message + '</li>';
-        };
-
-
-        // Show a disconnected message when the WebSocket is closed.
-        socket.onclose = function (event) {
-            socketStatus.innerHTML = 'Disconnected from WebSocket.';
-            socketStatus.className = 'closed';
-        };
-
-
-        // Send a message when the form is submitted.
-        form.onsubmit = function (e) {
-            e.preventDefault();
-
-            // Retrieve the message from the textarea.
-            var message = messageField.value;
-
-            // Send the message through the WebSocket.
-            socket.send(message);
-
-            // Add the message to the messages list.
-            messagesList.innerHTML += '<li class="sent"><span>Sent:</span>' + message + '</li>';
-
-            // Clear out the message field.
-            messageField.value = '';
-
-            return false;
-        };
-
-
-        // Close the WebSocket connection when the close button is clicked.
-        closeBtn.onclick = function (e) {
-            e.preventDefault();
-
-            // Close the WebSocket.
-            socket.close();
-
-            return false;
-        };
-
+<script type="text/javascript" charset="utf-8">
+    var protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+    var host = window.location.host;
+    var socket = new WebSocket(protocol + "//" + host + "/mywsdemo");
+    socket.onopen = function () {
+        console.log('Connected to: ' + event.currentTarget.url, 'open');
+    };
+    socket.onclose = function (evt) {
+        console.log('Disconnected from WebSocket.', 'closed');
+    };
+    socket.onmessage = function (event) {
+        // handle messages here
+        if (typeof event.data === 'string') {
+            // Text message
+            console.log('Received text message:' , event.data);
+        } else {
+            // Binary message
+            console.log('Received binary message:', event.data, socket.binaryType);
+        }
+    };
+    socket.onerror = function (evt) {
+        console.log('WebSocket Error: ' + evt, 'error');
     };
 
+    function send_large_data() {
+        const largeData = new ArrayBuffer(20 * 1024 * 1024); // xMB
+        const uint8Array = new Uint8Array(largeData);
+        for (let i = 0; i < uint8Array.length; i++) {
+            uint8Array[i] = Math.floor(Math.random() * 256);
+        }
+        socket.send(uint8Array);
+    }
+    function close_socket() {
+        socket.close();
+    }
+
+    function submit_form() {
+        var messageField = document.getElementById('message');
+        var message = messageField.value;
+        socket.send(message);
+        // Clear out the message field.
+        messageField.value = '';
+        return false;
+    }
 </script>
 {% endblock %}

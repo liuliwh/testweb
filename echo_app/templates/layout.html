@@ -24,7 +24,7 @@
         <a href="{{ url_for('anchor') }}" class="navbar-item">Anchor</a>
         <a href="{{ url_for('url_resource') }}" class="navbar-item">URL_Resource</a>
         <a href="/websocketdemo" class="navbar-item">websocket</a>
-        <a href="/a/dummy/dummy" class="navbar-item">Dummy/Dummy</a>
+        <a href="/dav/" class="navbar-item">WebDAV</a>
     </div>
     <div>
         <pre id="current_location"></pre>
@@ -57,6 +57,11 @@
         }
     </pre>
     </div>
+    <div style="background-color:powderblue;">
+        <h3>Log</h3>
+        <pre id="log"></pre>
+        <button id="clear_log">Clear log</button>
+    </div>
     <div class="parent">
         <div class="child">
             <form id="form_gen_page" action="/gen_page" method="post" enctype="text/plain"
@@ -87,7 +92,13 @@
         function _gen_submit(e) {
             var ele = document.querySelector('#txt_gen_page');
             var txt = ele.value;
-            ele.value = JSON.stringify(txt);
+            try {
+                JSON.parse(txt);
+                ele.value = JSON.stringify(txt);
+            } catch (error) {
+                alert('Invalid JSON');
+                return false;
+            }
         }
 
     </script>
@@ -105,15 +116,33 @@
         })();
         (function _current_location() {
             var ele = document.querySelector('#current_location');
-            var e = Object.assign({ "a": 1 }, location);
-            var e = window.location.
-                ele.innerHTML = e.toString();
+            ele.innerHTML = window.location.href;
         })();
         var e = document.createElement('a');
         var base = location['origin'];
         e.href = new URL("abc", base).toString() + '?1fixed' + Math.random().toString(36);
         e.innerText = 'click me';
         document.querySelector('#echo_request').appendChild(e);
+
+        (function () {
+            // 将console.log,以及window.error信息重定向到页面
+            var oldLog = console.log;
+            console.log = function () {
+                const logger = document.getElementById('log');
+                let message = Array.prototype.slice.call(arguments).join(' ');
+                logger.innerHTML += `> ${message}\n`;
+
+                oldLog.apply(console, arguments);
+            };
+            console.error = console.debug = console.info =  console.log;
+            window.addEventListener('error', (error) => {
+                console.log(`Error: ${error.message}`);
+            });
+
+            document.getElementById('clear_log').addEventListener('click', function () {
+                document.getElementById('log').innerHTML = '';
+            });
+        })();
     </script>
 </body>
 
